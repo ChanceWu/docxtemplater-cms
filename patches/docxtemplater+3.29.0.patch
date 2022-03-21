@@ -1,0 +1,19 @@
+diff --git a/node_modules/docxtemplater/js/lexer.js b/node_modules/docxtemplater/js/lexer.js
+index 6fb3e95..0363bbf 100644
+--- a/node_modules/docxtemplater/js/lexer.js
++++ b/node_modules/docxtemplater/js/lexer.js
+@@ -261,6 +261,14 @@ function getAllIndexes(fullText, delimiters) {
+   while (true) {
+     var startOffset = fullText.indexOf(start, offset + 1);
+     var endOffset = fullText.indexOf(end, offset + 1);
++		var tmpstrStartOffset = fullText.indexOf("`"+start, offset + 1);
++		var tmpstrEndOffset = fullText.indexOf(end + "`", offset + 1);
++		if (startOffset !== -1 && startOffset < tmpstrStartOffset && tmpstrStartOffset < endOffset) {
++			endOffset = fullText.indexOf(end, tmpstrEndOffset + 1);
++		} else if (startOffset !== -1 && tmpstrStartOffset !== -1 && startOffset > tmpstrStartOffset) {
++			startOffset = fullText.indexOf(start, tmpstrEndOffset + 1);
++			endOffset = fullText.indexOf(end, tmpstrEndOffset + 1);
++		}
+     var position = null;
+     var len = void 0;
+     var compareResult = compareOffsets(startOffset, endOffset);

@@ -1,0 +1,52 @@
+diff --git a/node_modules/docxtemplater-image-module/js/index.js b/node_modules/docxtemplater-image-module/js/index.js
+index 0150b7f..dfd097a 100644
+--- a/node_modules/docxtemplater-image-module/js/index.js
++++ b/node_modules/docxtemplater-image-module/js/index.js
+@@ -120,7 +120,7 @@ var ImageModule = function () {
+ 			if (!part.type === "placeholder" || part.module !== moduleName) {
+ 				return null;
+ 			}
+-			var tagValue = options.scopeManager.getValue(part.value);
++			var tagValue = options.scopeManager.getValue(part.value, { part });
+ 			if (!tagValue) {
+ 				return { value: this.fileTypeConfig.tagTextXml };
+ 			}
+@@ -128,9 +128,35 @@ var ImageModule = function () {
+ 			if (!imgBuffer) {
+ 				return { value: this.fileTypeConfig.tagTextXml };
+ 			}
+-			var rId = imgManager.addImageRels(this.getNextImageName(), imgBuffer);
+-			var sizePixel = this.options.getSize(imgBuffer, tagValue, part.value);
+-			return this.getRenderedPart(part, rId, sizePixel);
++			if (Array.isArray(imgBuffer)) {
++				let renderedParts = [];
++				imgBuffer.forEach((buf) => {
++					var rId = imgManager.addImageRels(this.getNextImageName(), buf);
++					var sizePixel = this.options.getSize(buf, tagValue, part.value);
++					renderedParts += this.getRenderedPart(part, rId, sizePixel).value;
++				});
++				return { value: renderedParts};
++			} else {
++				var rId = imgManager.addImageRels(this.getNextImageName(), imgBuffer);
++				var sizePixel = this.options.getSize(imgBuffer, tagValue, part.value);
++				return this.getRenderedPart(part, rId, sizePixel);
++			}
++		}
++	}, {
++		key: "resolve",
++		value: function resolve(part, options) {
++			if (!part.type === "placeholder" || part.module !== moduleName) {
++				return null;
++			}
++			var tagValue = options.scopeManager.getValue(part.value, { part });
++			if (!tagValue) {
++				return { value: this.fileTypeConfig.tagTextXml };
++			}
++			var promiseValue = this.options.getImage(tagValue, part.value);
++			if (!(promiseValue instanceof Promise)) {
++				return { value: "图片加载失败" }
++			}
++			return promiseValue;
+ 		}
+ 	}, {
+ 		key: "getRenderedPart",

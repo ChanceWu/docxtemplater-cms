@@ -1,0 +1,40 @@
+{
+  "name": "docxtemplater-cms",
+  "version": "1.0.0",
+  "description": "docx generator working with templates and data",
+  "main": "js/index.js",
+  "keywords": [
+    "docx",
+    "docxtemplater",
+    "docxtempater-image-module",
+    "doxtemplater-docx-module"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compiled": "rimraf js && mkdirp js && tsc",
+    "postinstall": "patch-package"
+  },
+  "dependencies": {
+    "angular-expressions": "^1.1.4",
+    "axios": "^0.26.1",
+    "dayjs": "^1.10.7",
+    "docxtemplater": "^3.25.4",
+    "docxtemplater-docx-module": "^1.0.0",
+    "docxtemplater-image-module": "^3.1.0",
+    "image-size": "^1.0.0",
+    "lodash": "^4.17.19",
+    "patch-package": "^6.4.7",
+    "pdf2pic": "^2.1.4",
+    "postinstall-postinstall": "^2.1.0",
+    "puppeteer": "^13.4.0",
+    "stream-pizzip": "^3.1.1"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.158",
+    "@types/gm": "^1.18.10",
+    "mkdirp": "^1.0.4",
+    "rimraf": "^3.0.2"
+  },
+  "author": "chance wu",
+  "license": "ISC"
+}
