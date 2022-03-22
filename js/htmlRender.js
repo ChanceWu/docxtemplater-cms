@@ -27,13 +27,9 @@ function renderUrl(url) {
 exports.renderUrl = renderUrl;
 function renderHtmlContent(htmlContent) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('1 ', Date());
         const browser = yield puppeteer_1.default.launch();
-        console.log('1.3 ', Date());
         const page = yield browser.newPage();
-        console.log('1.7 ', Date());
         yield page.setContent(htmlContent);
-        console.log('2 ', Date());
         return yield saveScreenshot(page, browser);
     });
 }

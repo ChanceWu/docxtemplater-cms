@@ -7,6 +7,7 @@ import _ from 'lodash';
 import PizZip from 'stream-pizzip';
 import sizeOf from 'image-size';
 import { getImageData, handleAxios } from './docxtemplater-utils';
+import fs from 'fs';
 import path from 'path';
 import { renderHtmlContent } from './htmlRender';
 
@@ -152,32 +153,23 @@ expressions.filters.getAddress = function(input: any) {
 
   return val.join('/');
 };
+const echartStr = fs.readFileSync(path.resolve(__dirname, '../public/js/echarts.min.js'), 'utf-8');
 const templates = [
-  "<!DOCTYPE html><html lang='en' style='height: 100%'><head><meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Document</title></head><body style='height: 100%; margin: 0'><div><h3>7777</h3><p>aaaaaaaaaaaaa</p><div id='text' class='text'>{{ target.aa }}</div></div><div id='container' style='height: 100%'></div></body><script src='http://localhost:3000/js/echarts.min.js'></script><script type='text/javascript'>var dom = document.getElementById('container');var myChart = echarts.init(dom);var app = {};var option = null;option = ",
+  "<!DOCTYPE html><html lang='en' style='height: 100%'><head><meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Document</title></head><body style='height: 100%; margin: 0'><div id='container' style='height: 100%'></div></body><script type='text/javascript'>"+echartStr+"</script><script type='text/javascript'>var dom = document.getElementById('container');var myChart = echarts.init(dom);var app = {};var option = null;option = ",
   ";if (option && typeof option === 'object') {myChart.setOption(option, true);}</script></html>",
 ];
-expressions.filters.getEchart = function(
-  input: any,
-  vMode: string,
-  options: any,
-) {
+expressions.filters.renderEchart = function(input: any) {
   if (!input) return '';
   // console.log('getEchart', input, vMode, JSON.parse(options))
-  if (vMode === 'echart') {
-    const optionCfg = { ...JSON.parse(options), series: input };
-    return {
-      type: 'echart',
-      data: templates[0] + JSON.stringify(optionCfg) + templates[1],
-    };
-  }
-  return input;
+  // const optionCfg = { ...JSON.parse(options), series: input };
+  return {
+    type: 'echart',
+    data: templates[0] + JSON.stringify(input) + templates[1],
+  };
 };
-expressions.filters.getHtml = function(input: any, vMode: string) {
+expressions.filters.renderHtml = function(input: any) {
   if (!input) return '';
-  if (vMode === 'html') {
-    return { type: 'html', data: input };
-  }
-  return input;
+  return { type: 'html', data: input };
 };
 expressions.filters.getImage = function(input: any, maxSize: number) {
   if (!input) return input;
