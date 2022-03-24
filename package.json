@@ -1,6 +1,6 @@
 {
   "name": "docxtemplater-cms",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "docx generator working with templates and data",
   "main": "js/index.js",
   "keywords": [
