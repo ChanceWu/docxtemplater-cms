@@ -3,7 +3,7 @@
 *.log
 *.old
 *.tgz
-*.png
+# *.png
 *.sublime-project
 *.sublime-workspace
 .~lock*

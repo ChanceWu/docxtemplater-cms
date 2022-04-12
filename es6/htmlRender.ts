@@ -10,7 +10,9 @@ export async function renderUrl(url: string) {
 }
 
 export async function renderHtmlContent(htmlContent: string) {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-dev-shm-usage'],
+  });
   const page = await browser.newPage();
   await page.setContent(htmlContent);
 
