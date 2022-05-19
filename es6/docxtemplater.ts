@@ -18,7 +18,7 @@ interface Option {
 
 // 判断选项中是否存在 "其他" 选项
 function hasOtherOption(options: Option[]): boolean {
-  return options.filter(op => op.value === '|OTHER|').length > 0;
+  return options.filter((op) => op.value === '|OTHER|').length > 0;
 }
 // 获取“其他”选项对应input框的输入值
 function getOtherValue(options: Option[], input: any) {
@@ -53,7 +53,7 @@ function handleLabel(input: any, ...field: any) {
       const options = curField.options || [];
       const curOptions = _.filter(
         options,
-        item => input.indexOf(item.value) > -1,
+        (item) => input.indexOf(item.value) > -1,
       );
       const curLabels = _.map(curOptions, 'label');
       if (curOptions.length < input.length && hasOtherOption(options)) {
@@ -66,7 +66,7 @@ function handleLabel(input: any, ...field: any) {
       const options = curField.__slot__?.options || [];
       const curOptions = _.filter(
         options,
-        item => input.indexOf(item.value) > -1,
+        (item) => input.indexOf(item.value) > -1,
       );
       const curLabels = _.map(curOptions, 'label');
       if (curOptions.length < input.length && hasOtherOption(options)) {
@@ -94,7 +94,7 @@ function getLabelLoop(inputArr: string[], options: any[]): string {
   }
   return label + '/' + getLabelLoop(inputArr, curOption.children);
 }
-expressions.filters.getLabel = function(input: any, ...field: any) {
+expressions.filters.getLabel = function (input: any, ...field: any) {
   // This condition should be used to make sure that if your input is
   // undefined, your output will be undefined as well and will not
   // throw an error
@@ -102,16 +102,16 @@ expressions.filters.getLabel = function(input: any, ...field: any) {
   const res = handleLabel(input, ...field);
   return res.label;
 };
-expressions.filters.formatDate = function(input: any, format: any) {
+expressions.filters.formatDate = function (input: any, format: any) {
   if (!input) return input;
   return dayjs(input).format(format);
 };
-expressions.filters.formatTime = function(input: any, format: any) {
+expressions.filters.formatTime = function (input: any, format: any) {
   if (!input) return input;
   const _date = '2021-11-11';
   return dayjs(_date + input).format(format);
 };
-expressions.filters.isSelectedLabel = function(
+expressions.filters.isSelectedLabel = function (
   input: any,
   vMode: string,
   define: any,
@@ -138,49 +138,62 @@ expressions.filters.isSelectedLabel = function(
   return unselected;
 };
 // 不推荐使用，使用场景可被 isSelectedLabel 替换
-expressions.filters.isSelected = function(input: any, key: number | string) {
+expressions.filters.isSelected = function (input: any, key: number | string) {
   if (!input) return input;
   if (!Array.isArray(input)) return false;
   return input.includes(key);
 };
-expressions.filters.getAddress = function(input: any) {
+expressions.filters.getAddress = function (input: any, sep: string) {
   if (!input) return input;
-  const data = typeof input === 'string' ? JSON.parse(input) : input;
-  const val = data?.region.filter((r: any) => r).map((r: any) => r.name) || [];
-  if (data?.detail) {
-    val.push(data.detail);
+  let separator = sep ?? '/';
+  if (typeof input === 'string') {
+    try {
+      const data = JSON.parse(input);
+      const val =
+        data?.region.filter((r: any) => r).map((r: any) => r.name) || [];
+      if (data?.detail) {
+        val.push(data.detail);
+      }
+      return val.join(separator);
+    } catch (err) {
+      console.log('getAddress parsing value get err->', input);
+    }
   }
-
-  return val.join('/');
+  return input;
 };
-const echartStr = fs.readFileSync(path.resolve(__dirname, '../public/js/echarts.min.js'), 'utf-8');
+const echartStr = fs.readFileSync(
+  path.resolve(__dirname, '../public/js/echarts.min.js'),
+  'utf-8',
+);
 const eTemplates = [
-  "<!DOCTYPE html><html lang='en' style='height: 100%'><head><meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Document</title></head><body style='height: 100%; margin: 0'><div id='container' style='height: 100%'></div></body><script type='text/javascript'>"+echartStr+"</script><script type='text/javascript'>var dom = document.getElementById('container');var myChart = echarts.init(dom);var app = {};var option = null;option = ",
+  "<!DOCTYPE html><html lang='en' style='height: 100%'><head><meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Document</title></head><body style='height: 100%; margin: 0'><div id='container' style='height: 100%'></div></body><script type='text/javascript'>" +
+    echartStr +
+    "</script><script type='text/javascript'>var dom = document.getElementById('container');var myChart = echarts.init(dom);var app = {};var option = null;option = ",
   ";if (option && typeof option === 'object') {myChart.setOption(option, true);}</script></html>",
 ];
 const hTemplates = [
-  "<!DOCTYPE html><html lang='en' style='height: 100%'><head><meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Document</title><script type='text/javascript'>"+echartStr+"</script></head><body style='height: 100%; margin: 0'>",
-  "</body></html>",
+  "<!DOCTYPE html><html lang='en' style='height: 100%'><head><meta charset='UTF-8'><meta http-equiv='X-UA-Compatible' content='IE=edge'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>Document</title><script type='text/javascript'>" +
+    echartStr +
+    "</script></head><body style='height: 100%; margin: 0'>",
+  '</body></html>',
 ];
-expressions.filters.renderEchart = function(input: any) {
+expressions.filters.renderEchart = function (input: any) {
   if (!input) return '';
-  // console.log('getEchart', input, vMode, JSON.parse(options))
-  // const optionCfg = { ...JSON.parse(options), series: input };
   return {
     type: 'echart',
     data: eTemplates[0] + JSON.stringify(input) + eTemplates[1],
   };
 };
-expressions.filters.renderHtml = function(input: any) {
+expressions.filters.renderHtml = function (input: any) {
   if (!input) return '';
   return {
     type: 'html',
     data: hTemplates[0] + JSON.stringify(input) + hTemplates[1],
   };
 };
-expressions.filters.getImage = function(input: any, maxSize: number) {
+expressions.filters.getImage = function (input: any, maxSize: number) {
   if (!input) return input;
-  // console.log('getImage', input, maxSize);
+  console.log('getImage', input, maxSize);
   return input;
 };
 function angularParser(tag: string) {
@@ -190,7 +203,7 @@ function angularParser(tag: string) {
     .replace(/(“|”)/g, '"');
   const expr = expressions.compile(tag);
   return {
-    get: function(scope: any, context: any) {
+    get: function (scope: any, context: any) {
       let obj = {};
       const index = _.last(context.scopePathItem);
       const scopeList = context.scopeList;
@@ -208,7 +221,7 @@ function angularParser(tag: string) {
 // with JSON.stringify (it contains a properties object containing all suberrors).
 function replaceErrors(key: any, value: any) {
   if (value instanceof Error) {
-    return Object.getOwnPropertyNames(value).reduce(function(
+    return Object.getOwnPropertyNames(value).reduce(function (
       error: any,
       key: any,
     ) {
@@ -225,7 +238,7 @@ function errorHandler(error: any) {
 
   if (error.properties && error.properties.errors instanceof Array) {
     const errorMessages = error.properties.errors
-      .map(function(error: any) {
+      .map(function (error: any) {
         return error.properties.explanation;
       })
       .join('\n');
@@ -247,7 +260,8 @@ function nullGetter(part: DXT.Part) {
   return '';
 }
 
-function getImgSize(img: Buffer) {
+function getImgSize(img: Buffer, w: string, h: string) {
+  if (w && h) return [w, h];
   try {
     let { width = 595, height = 842 } = sizeOf(img);
     if (width > 595) width = 595;
@@ -265,20 +279,20 @@ export async function handleDocxTemplater(templateData: any, data: any) {
   const content = templateData;
   const imageModule = new ImageModule({
     centered: false,
-    getImage: function(tagValue: any, tagName: string) {
+    getImage: function (tagValue: any, tagName: string) {
       // console.log('getImage ', tagValue, tagName)
       if (!tagValue) return '';
       if (typeof tagValue === 'object' && tagValue.type === 'echart') {
         // console.log('a-----', fs.readFileSync(path.resolve(__dirname, '002.html')))
-        return new Promise(resolve => {
-          console.log('3 ', Date());
+        return new Promise((resolve) => {
+          console.log('start create picture...', Date());
           renderHtmlContent(tagValue.data)
-            .then(data => {
+            .then((data) => {
               // console.log('getImageData', data);
-              console.log('4 ', Date());
+              console.log('end create picture...', Date());
               return resolve(data);
             })
-            .catch(err => {
+            .catch((err) => {
               console.log('getImageAsync get error ', err);
               return resolve('');
             });
@@ -293,25 +307,25 @@ export async function handleDocxTemplater(templateData: any, data: any) {
           // });
         });
       } else if (typeof tagValue === 'object' && tagValue.type === 'html') {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           renderHtmlContent(tagValue.data)
-            .then(data => {
+            .then((data) => {
               // console.log('getHTMLData', data);
               return resolve(data);
             })
-            .catch(err => {
+            .catch((err) => {
               console.log('getHTMLAsync get error ', err);
               return resolve('');
             });
         });
       } else if (typeof tagValue === 'string') {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           getImageData(tagValue, path.basename(tagValue))
-            .then(data => {
+            .then((data) => {
               // console.log('getImageData', data);
               return resolve(data);
             })
-            .catch(err => {
+            .catch((err) => {
               console.log('getImageAsync get error ', err);
               return resolve('');
             });
@@ -319,13 +333,14 @@ export async function handleDocxTemplater(templateData: any, data: any) {
       }
       return tagValue;
     },
-    getSize: function(img: any, tagValue: any, tagName: string) {
+    getSize: function (img: any, tagValue: any, tagName: string) {
       // console.log('getSize----', img, getImgSize(img));
-      return getImgSize(img);
+      const params = tagName.split(':');
+      return getImgSize(img, params[1], params[2]);
     },
   });
   const docxModule = new DocxModule({
-    getDocx: function(tagValue: string) {
+    getDocx: function (tagValue: string) {
       // console.log('tagValue', tagValue)
       return new Promise((resolve, reject) => {
         // if (fs.existsSync(tagValue)) {
@@ -335,10 +350,10 @@ export async function handleDocxTemplater(templateData: any, data: any) {
         //   reject(new Error("not such file or folder " + tagValue));
         // }
         handleAxios(tagValue)
-          .then(data => {
+          .then((data) => {
             return resolve(data);
           })
-          .catch(err => {
+          .catch((err) => {
             console.log('getAttachAsync get error ', err);
             return resolve('');
           });
