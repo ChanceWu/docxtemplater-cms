@@ -180,7 +180,7 @@ expressions.filters.renderHtml = function(input: any) {
 };
 expressions.filters.getImage = function(input: any, maxSize: number) {
   if (!input) return input;
-  console.log('getImage', input, maxSize);
+  // console.log('getImage', input, maxSize);
   return input;
 };
 function angularParser(tag: string) {
@@ -237,7 +237,7 @@ function errorHandler(error: any) {
   throw error;
 }
 function nullGetter(part: DXT.Part) {
-  console.log('nullgetter', part);
+  // console.log('nullgetter', part);
   if (!part.module) {
     return '';
   }
